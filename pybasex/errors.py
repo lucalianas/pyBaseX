@@ -12,3 +12,7 @@ class ConfigurationError(Exception):
 
 class UnknownDatabaseError(Exception):
     pass
+
+
+class WrongURLError(Exception):
+    pass
