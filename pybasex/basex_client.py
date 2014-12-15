@@ -78,9 +78,16 @@ class BaseXClient(object):
 
     # --- objects creation methods
     @errors_handler
-    def create_database(self, database=None):
+    def create_database(self, database=None, overwrite=False):
         db = self._resolve_database(database)
-        response = self.session.put(self._build_url(db))
+        self.logger.info('Creating database "%s", overwrite is set to "%s"' % (db, overwrite))
+        if overwrite:
+            response = self.session.put(self._build_url(db))
+        else:
+            if db not in self.get_databases():
+                response = self.session.put(self._build_url(db))
+            else:
+                raise pbx_errors.OverwriteError('Database "%s" already exists and overwrite disabled' % db)
         if response.status_code == requests.codes.not_found:
             self._handle_wrong_url()
 

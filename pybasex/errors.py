@@ -16,3 +16,7 @@ class UnknownDatabaseError(Exception):
 
 class WrongURLError(Exception):
     pass
+
+
+class OverwriteError(Exception):
+    pass
