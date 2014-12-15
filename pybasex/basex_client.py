@@ -95,6 +95,17 @@ class BaseXClient(object):
             self._handle_wrong_url()
         self.logger.info('RESPONSE (status code %d): %s', response.status_code, response.text)
 
+    @errors_handler
+    def add_document(self, xml_doc, document_id, database=None):
+        db = self._resolve_database(database)
+        if document_id in self.get_resources(db):
+            raise pbx_errors.OverwriteError('A document with ID "%s" already exists in database "%s"' %
+                                            (document_id, db))
+        xml_doc = pbx_xml_utils.xml_to_str(xml_doc)
+        self.logger.debug('Saving document %s' % xml_doc)
+        response = self.session.put(self._build_url(db, document_id), xml_doc)
+        self.logger.info('RESPONSE (status code %d): %s', response.status_code, response.text)
+
     # --- objects retrieval methods
     @errors_handler
     def get_databases(self):
@@ -126,10 +137,30 @@ class BaseXClient(object):
             }
         return res_map
 
+    @errors_handler
+    def get_document(self, document_id, database=None):
+        db = self._resolve_database(database)
+        response = self.session.get(self._build_url(db, document_id))
+        if response.status_code == requests.codes.not_found:
+            self._check_url(db)
+        result = pbx_xml_utils.str_to_xml(response.text)
+        if result.tag == '{http://basex.org/rest}databases' and result.get('resources') == 0:
+            self.logger.info('There is not document with ID "%s" in database "%s"' % (document_id, db))
+            return None
+        else:
+            return result
+
     # --- objects deletion methods
     @errors_handler
     def delete_database(self, database=None):
         db = self._resolve_database(database)
         response = self.session.delete(self._build_url(db))
+        if response.status_code == requests.codes.not_found:
+            self._check_url(db)
+
+    @errors_handler
+    def delete_document(self, document_id, database=None):
+        db = self._resolve_database(database)
+        response = self.session.delete(self._build_url(db, document_id))
         if response.status_code == requests.codes.not_found:
             self._check_url(db)
