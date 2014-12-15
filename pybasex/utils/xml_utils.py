@@ -10,4 +10,4 @@ def str_to_xml(str_doc):
 
 
 def xml_to_str(xml_doc):
-    return ElementTree.tostring(xmll_doc)
+    return ElementTree.tostring(xml_doc)
