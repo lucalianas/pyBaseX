@@ -14,7 +14,7 @@ class UnknownDatabaseError(Exception):
     pass
 
 
-class WrongURLError(Exception):
+class InvalidURLError(Exception):
     pass
 
 

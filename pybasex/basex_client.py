@@ -74,7 +74,7 @@ class BaseXClient(object):
     def _handle_wrong_url(self):
         msg = 'Unable to complete the request, "%s" is not a valid BaseX REST URL' % self.url
         self.logger.error(msg)
-        raise pbx_errors.WrongURLError(msg)
+        raise pbx_errors.InvalidURLError(msg)
 
     # --- objects creation methods
     @errors_handler
