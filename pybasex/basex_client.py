@@ -76,6 +76,12 @@ class BaseXClient(object):
         self.logger.error(msg)
         raise pbx_errors.InvalidURLError(msg)
 
+    def _check_url(self, database):
+        # check for invalid BaseX URL
+        _ = self.get_databases()
+        # URL is a valid one, database does not exist
+        raise pbx_errors.UnknownDatabaseError('Database "%s" does not exist' % database)
+
     # --- objects creation methods
     @errors_handler
     def create_database(self, database=None, overwrite=False):
@@ -111,9 +117,7 @@ class BaseXClient(object):
         db = self._resolve_database(database)
         response = self.session.get(self._build_url(db))
         if response.status_code == requests.codes.not_found:
-            # check for wrong URL
-            _ = self.get_databases()
-            raise pbx_errors.UnknownDatabaseError('Database "%s" does not exist' % db)
+            self._check_url(db)
         results = pbx_xml_utils.str_to_xml(response.text)
         res_map = {}
         for ch in results.getchildren():
@@ -130,6 +134,4 @@ class BaseXClient(object):
         db = self._resolve_database(database)
         response = self.session.delete(self._build_url(db))
         if response.status_code == requests.codes.not_found:
-            # check for wrong URL
-            _ = self.get_databases()
-            raise pbx_errors.UnknownDatabaseError('Database "%s" does not exist' % db)
+            self._check_url(db)
