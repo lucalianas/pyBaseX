@@ -1,5 +1,5 @@
 import os, unittest, sys
-from xml.etree.ElementTree import fromstring
+from lxml.etree import fromstring
 
 from pybasex import BaseXClient
 

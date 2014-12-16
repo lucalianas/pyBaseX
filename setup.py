@@ -31,5 +31,6 @@ setup(
     ],
     requires=[
         'requests',
+        'lxml',
     ]
 )
