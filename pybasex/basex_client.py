@@ -4,6 +4,7 @@ from functools import wraps
 import errors as pbx_errors
 import utils as pbx_utils
 import utils.xml_utils as pbx_xml_utils
+from fragments import build_query_fragment
 
 
 class BaseXClient(object):
@@ -81,6 +82,10 @@ class BaseXClient(object):
         _ = self.get_databases()
         # URL is a valid one, database does not exist
         raise pbx_errors.UnknownDatabaseError('Database "%s" does not exist' % database)
+
+    def _wrap_results(self, res_text):
+        res_text = '<results>{0}</results>'.format(res_text)
+        return pbx_xml_utils.str_to_xml(res_text)
 
     # --- objects creation methods
     @errors_handler
@@ -164,3 +169,16 @@ class BaseXClient(object):
         response = self.session.delete(self._build_url(db, document_id))
         if response.status_code == requests.codes.not_found:
             self._check_url(db)
+
+    # --- commands\queries execution methods
+    @errors_handler
+    def execute_query(self, query, database=None):
+        db = self._resolve_database(database)
+        q_frag = build_query_fragment(query)
+        response = self.session.post(self._build_url(db),
+                                     pbx_utils.xml_utils.xml_to_str(q_frag))
+        if response.status_code == requests.codes.not_found:
+            self._check_url(db)
+        if response.status_code == requests.codes.bad:
+            raise pbx_errors.QueryError('Query error: ' + response.text.replace('\n', ' '))
+        return self._wrap_results(response.text)

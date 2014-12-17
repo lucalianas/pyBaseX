@@ -20,3 +20,7 @@ class InvalidURLError(Exception):
 
 class OverwriteError(Exception):
     pass
+
+
+class QueryError(Exception):
+    pass
