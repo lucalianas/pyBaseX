@@ -30,13 +30,14 @@ setup(
     author_email=AUTHOR_EMAIL,
     url=URL,
     license='MIT License',
-    keyword=['BaseX', 'REST', 'HTTP', 'XPATH', 'XML', 'database', 'python'],
+    keywords=['BaseX', 'REST', 'HTTP', 'XPATH', 'XML', 'database', 'python'],
     maintainer=MAINTAINER,
     maintainer_email=MAINTAINER_EMAIL,
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Intended Audience :: Developers',
     ],
     packages=[
         'pybasex',
