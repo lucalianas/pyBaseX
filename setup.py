@@ -4,7 +4,17 @@ except ImportError:
     from distutils.core import setup
 from distutils.errors import DistutilsSetupError
 
-import pybasex
+DESCRIPTION = 'pyBaseX: a Python adapter for BaseX REST interface'
+LONG_DESCRIPTION = """
+pyBaseX: a Python adapter for BaseX REST interface
+--------------------------------------------------
+
+pyBaseX is a Python package that provides functionality to interact with BaseX via REST interface.
+
+The main features include:
+ * CRUD methods for databases and documents
+ * XPATH queries execution
+"""
 
 AUTHOR_INFO = [
     ('Luca Lianas', 'lucalianas@gmail.com')
@@ -27,8 +37,8 @@ except IOError:
 setup(
     name=NAME,
     version=VERSION,
-    description=pybasex.__doc__.strip().splitlines()[0],
-    long_description=pybasex.__doc__.strip(),
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     url=URL,
