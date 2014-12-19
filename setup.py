@@ -1,4 +1,7 @@
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 from distutils.errors import DistutilsSetupError
 
 import pybasex
@@ -30,13 +33,16 @@ setup(
     author_email=AUTHOR_EMAIL,
     url=URL,
     license='MIT License',
+    platforms=['any'],
     keywords=['BaseX', 'REST', 'HTTP', 'XPATH', 'XML', 'database', 'python'],
     maintainer=MAINTAINER,
     maintainer_email=MAINTAINER_EMAIL,
     classifiers=[
+        'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
         'Intended Audience :: Developers',
     ],
     packages=[
@@ -44,6 +50,12 @@ setup(
         'pybasex.utils',
     ],
     requires=[
+        'setuptools',
+        'requests',
+        'lxml',
+    ],
+    install_requires=[
+        'setuptools',
         'requests',
         'lxml',
     ]
