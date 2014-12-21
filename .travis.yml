@@ -29,7 +29,7 @@ install:
   - python setup.py install
 
 script:
-  - nosetests -v --with-coverage
+  - nosetests -v --with-coverage --cover-package pybasex
   
 after_success:
   - coveralls
