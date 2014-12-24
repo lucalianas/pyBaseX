@@ -25,6 +25,7 @@ AUTHOR_EMAIL = '', ''.join('<%s>' % t[1] for t in AUTHOR_INFO)
 MAINTAINER = ", ".join(t[0] for t in MAINTAINER_INFO)
 MAINTAINER_EMAIL = ", ".join("<%s>" % t[1] for t in MAINTAINER_INFO)
 URL = 'https://github.com/lucalianas/pyBaseX'
+DOWNLOAD_URL = 'https://github.com/lucalianas/pyBaseX/releases'
 
 try:
     with open("NAME") as f:
@@ -42,6 +43,7 @@ setup(
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     url=URL,
+    download_url=DOWNLOAD_URL,
     license='MIT License',
     platforms=['any'],
     keywords=['BaseX', 'REST', 'HTTP', 'XPATH', 'XML', 'database', 'python'],
