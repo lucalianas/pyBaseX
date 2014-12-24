@@ -7,6 +7,11 @@ python:
 jdk:
   - oraclejdk7
 
+branches:
+  only:
+    - master
+    - develop
+
 env:
   global:
     - BASEX_BASE_URL=http://localhost:8984/rest
