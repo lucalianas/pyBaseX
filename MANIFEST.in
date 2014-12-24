@@ -1,0 +1,5 @@
+include NAME VERSION
+
+recursive-include pybasex *.py
+
+recursive-include test *.py
