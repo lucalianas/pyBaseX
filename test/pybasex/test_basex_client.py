@@ -5,13 +5,13 @@ from collections import Counter
 from pybasex import BaseXClient
 from pybasex.utils import get_logger
 
-BASEX_URL = os.getenv('BASEX_BASE_URL')
-
 
 class TestBaseXClient(unittest.TestCase):
 
     def __init__(self, label):
         super(TestBaseXClient, self).__init__(label)
+        self.db_name = 'test_basex'
+        self.basex_url = os.getenv('BASEX_BASE_URL')
 
     def _build_documents(self, pool_size):
         documents = []
@@ -24,25 +24,31 @@ class TestBaseXClient(unittest.TestCase):
         return documents
 
     def setUp(self):
-        if BASEX_URL is None:
+        if self.basex_url is None:
             sys.exit('ERROR: no base URL for BaseX database provided')
 
+    def test_connect(self):
+        c = BaseXClient(self.basex_url, self.db_name)
+        self.assertFalse(c.connected)
+        c.connect()
+        self.assertTrue(c.connected)
+        c.disconnect()
+        self.assertFalse(c.connected)
+
     def test_database(self):
-        db_name = 'test_basex'
-        with BaseXClient(BASEX_URL, default_database=db_name,
+        with BaseXClient(self.basex_url, default_database=self.db_name,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             dbs = bx_client.get_databases()
-            self.assertIn(db_name, dbs.keys())
+            self.assertIn(self.db_name, dbs.keys())
             bx_client.delete_database()
             dbs = bx_client.get_databases()
             self.assertEqual(len(dbs), 0)
 
     def test_document(self):
-        db_name = 'test_basex'
         doc_id = 'test_document_001'
         str_doc = '<tree><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
-        with BaseXClient(BASEX_URL, default_database=db_name,
+        with BaseXClient(self.basex_url, default_database=self.db_name,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             bx_client.add_document(fromstring(str_doc), doc_id)
@@ -57,10 +63,9 @@ class TestBaseXClient(unittest.TestCase):
             self.assertEqual(len(dbs), 0)
 
     def test_xpath(self):
-        db_name = 'test_basex'
         doc_id_pattern = 'test_document_%03d'
         ct = Counter()
-        with BaseXClient(BASEX_URL, default_database=db_name,
+        with BaseXClient(self.basex_url, default_database=self.db_name,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             for doc in self._build_documents(20):
@@ -82,6 +87,7 @@ class TestBaseXClient(unittest.TestCase):
 
 def suite():
     tests_suite = unittest.TestSuite()
+    tests_suite.addTest(TestBaseXClient('test_connect'))
     tests_suite.addTest(TestBaseXClient('test_database'))
     tests_suite.addTest(TestBaseXClient('test_document'))
     tests_suite.addTest(TestBaseXClient('test_xpath'))
