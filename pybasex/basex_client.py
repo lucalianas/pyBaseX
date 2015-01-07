@@ -83,6 +83,10 @@ class BaseXClient(object):
         # URL is a valid one, database does not exist
         raise pbx_errors.UnknownDatabaseError('Database "%s" does not exist' % database)
 
+    def _check_response_tag(self, response_xml):
+        if response_xml.tag != '{http://basex.org/rest}databases':
+            self._handle_wrong_url()
+
     def _wrap_results(self, res_text):
         res_text = '<results>{0}</results>'.format(res_text)
         return pbx_xml_utils.str_to_xml(res_text)
@@ -118,6 +122,7 @@ class BaseXClient(object):
         if response.status_code == requests.codes.not_found:
             self._handle_wrong_url()
         results = pbx_xml_utils.str_to_xml(response.text)
+        self._check_response_tag(results)
         dbs_map = {}
         for ch in results.getchildren():
             dbs_map[ch.text] = {
@@ -133,6 +138,7 @@ class BaseXClient(object):
         if response.status_code == requests.codes.not_found:
             self._check_url(db)
         results = pbx_xml_utils.str_to_xml(response.text)
+        self._check_response_tag(results)
         res_map = {}
         for ch in results.getchildren():
             res_map[ch.text] = {
