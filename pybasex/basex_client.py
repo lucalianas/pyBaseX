@@ -149,7 +149,7 @@ class BaseXClient(object):
         if response.status_code == requests.codes.not_found:
             self._check_url(db)
         result = pbx_xml_utils.str_to_xml(response.text)
-        if result.tag == '{http://basex.org/rest}databases' and result.get('resources') == 0:
+        if result.tag == '{http://basex.org/rest}databases' and int(result.get('resources')) == 0:
             self.logger.info('There is not document with ID "%s" in database "%s"' % (document_id, db))
             return None
         else:
