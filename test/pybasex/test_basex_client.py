@@ -13,6 +13,8 @@ class TestBaseXClient(unittest.TestCase):
         super(TestBaseXClient, self).__init__(label)
         self.db_name = 'test_basex'
         self.basex_url = os.getenv('BASEX_BASE_URL')
+        self.basex_user = os.getenv('BASEX_USER')
+        self.basex_passwd = os.getenv('BASEX_PASSWD')
 
     def _build_documents(self, pool_size):
         documents = []
@@ -29,7 +31,8 @@ class TestBaseXClient(unittest.TestCase):
             sys.exit('ERROR: no base URL for BaseX database provided')
 
     def test_connect(self):
-        c = BaseXClient(self.basex_url, self.db_name)
+        c = BaseXClient(self.basex_url, self.db_name, self.basex_user,
+                        self.basex_passwd)
         with self.assertRaises(pbx_errors.ConnectionClosedError):
             c.get_databases()
         self.assertFalse(c.connected)
@@ -40,6 +43,7 @@ class TestBaseXClient(unittest.TestCase):
 
     def test_context_manager(self):
         with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             self.assertTrue(bx_client.connected)
         self.assertFalse(bx_client.connected)
@@ -51,6 +55,7 @@ class TestBaseXClient(unittest.TestCase):
 
     def test_create_database(self):
         with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             dbs = bx_client.get_databases()
@@ -61,6 +66,7 @@ class TestBaseXClient(unittest.TestCase):
 
     def test_delete_database(self):
         with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             with self.assertRaises(pbx_errors.UnknownDatabaseError):
                 bx_client.delete_database('test_fake')
@@ -71,6 +77,7 @@ class TestBaseXClient(unittest.TestCase):
         doc_id = 'test_document_001'
         str_doc = '<tree><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
         with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             bx_client.add_document(fromstring(str_doc), doc_id)
@@ -87,6 +94,7 @@ class TestBaseXClient(unittest.TestCase):
         doc_id = 'test_document_001'
         str_doc = '<tree><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
         with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             bx_client.add_document(fromstring(str_doc), doc_id)
@@ -105,6 +113,7 @@ class TestBaseXClient(unittest.TestCase):
         doc_id = 'test_document_001'
         str_doc = '<tree><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
         with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             bx_client.add_document(fromstring(str_doc), doc_id)
@@ -121,6 +130,7 @@ class TestBaseXClient(unittest.TestCase):
         doc_id_pattern = 'test_document_%03d'
         ct = Counter()
         with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
             for doc in self._build_documents(20):
