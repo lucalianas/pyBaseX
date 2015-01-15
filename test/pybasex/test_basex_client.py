@@ -80,9 +80,13 @@ class TestBaseXClient(unittest.TestCase):
                          user=self.basex_user, password=self.basex_passwd,
                          logger=get_logger('test', silent=True)) as bx_client:
             bx_client.create_database()
-            bx_client.add_document(fromstring(str_doc), doc_id)
+            _id = bx_client.add_document(fromstring(str_doc))
             res = bx_client.get_resources()
-            self.assertIn(doc_id, res.keys())
+            self.assertIn(_id, res.keys())
+            _id = bx_client.add_document(fromstring(str_doc), doc_id)
+            self.assertEqual(_id, doc_id)
+            res = bx_client.get_resources()
+            self.assertIn(_id, res.keys())
             with self.assertRaises(pbx_errors.OverwriteError):
                 bx_client.add_document(fromstring(str_doc), doc_id)
             with self.assertRaises(pbx_errors.UnknownDatabaseError):

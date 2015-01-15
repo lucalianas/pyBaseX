@@ -1,5 +1,6 @@
 import requests
 from functools import wraps
+from uuid import uuid4
 
 import errors as pbx_errors
 import utils as pbx_utils
@@ -121,7 +122,8 @@ class BaseXClient(object):
         self.logger.info('RESPONSE (status code %d): %s', response.status_code, response.text)
 
     @errors_handler
-    def add_document(self, xml_doc, document_id, database=None):
+    def add_document(self, xml_doc, document_id=None, database=None):
+        document_id = document_id or uuid4().hex
         db = self._resolve_database(database)
         if document_id in self.get_resources(db):
             raise pbx_errors.OverwriteError('A document with ID "%s" already exists in database "%s"' %
@@ -132,6 +134,7 @@ class BaseXClient(object):
             response=self.session.put(self._build_url(db, document_id), xml_doc)
         )
         self.logger.info('RESPONSE (status code %d): %s', response.status_code, response.text)
+        return document_id
 
     # --- objects retrieval methods
     @errors_handler
