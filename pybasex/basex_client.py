@@ -107,6 +107,10 @@ class BaseXClient(object):
         res_text = '<results>{0}</results>'.format(res_text)
         return pbx_xml_utils.str_to_xml(res_text)
 
+    def _rollback(self, doc_ids, database=None):
+        for d_id in doc_ids:
+            self.delete_document(d_id, database)
+
     def _get_document_id(self):
         return uuid4().hex
 
@@ -124,6 +128,14 @@ class BaseXClient(object):
             raise pbx_errors.OverwriteError('Database "%s" already exists' % db)
         self.logger.info('RESPONSE (status code %d): %s', response.status_code, response.text)
 
+    def _save_document(self, xml_doc, document_id, database):
+        response = self._check_response_code(
+            response=self.session.put(
+                self._build_url(database, document_id), xml_doc
+            )
+        )
+        return response
+
     @errors_handler
     def add_document(self, xml_doc, document_id=None, database=None):
         document_id = document_id or self._get_document_id()
@@ -133,11 +145,45 @@ class BaseXClient(object):
                                             (document_id, db))
         xml_doc = pbx_xml_utils.xml_to_str(xml_doc)
         self.logger.debug('Saving document %s' % xml_doc)
-        response = self._check_response_code(
-            response=self.session.put(self._build_url(db, document_id), xml_doc)
-        )
+        response = self._save_document(xml_doc, document_id, db)
         self.logger.info('RESPONSE (status code %d): %s', response.status_code, response.text)
         return document_id
+
+    @errors_handler
+    def add_documents(self, documents, database=None, skip_duplicated=False):
+        db = self._resolve_database(database)
+        saved_ids = list()
+        duplicated_ids = list()
+        if isinstance(documents, list) or isinstance(documents, set):
+            documents = {self._get_document_id(): doc for doc in documents}
+        elif isinstance(documents, dict):
+            pass
+        else:
+            raise TypeError('%s is not a valid type for "documents" field' % type(documents))
+        known_ids = self.get_resources(db)
+        for doc_id in documents.keys():
+            if doc_id in known_ids:
+                duplicated_ids.append(doc_id)
+        if skip_duplicated:
+            for dupl_id in duplicated_ids:
+                documents.pop(dupl_id)
+        else:
+            if len(duplicated_ids) > 0:
+                raise pbx_errors.OverwriteError('IDs %r already used in database %s' %
+                                                (duplicated_ids, db))
+        self.logger.info('Saving %d documents to database %s', len(documents), db)
+        try:
+            for doc_id, doc in documents.iteritems():
+                response = self._save_document(pbx_xml_utils.xml_to_str(doc), doc_id, db)
+                saved_ids.append(doc_id)
+                self.logger.debug('RESPONSE (status code %d): %s', response.status_code, response.text)
+        except Exception, e:
+            self.logger.critical('An error occurred, performing rollback')
+            self._rollback(saved_ids, db)
+            raise e
+        self.logger.info('%d documents saved, %d duplicated found',
+                         len(saved_ids), len(duplicated_ids))
+        return saved_ids, duplicated_ids
 
     # --- objects retrieval methods
     @errors_handler

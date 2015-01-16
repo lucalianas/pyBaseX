@@ -102,6 +102,40 @@ class TestBaseXClient(unittest.TestCase):
                 bx_client.add_document(fromstring(str_doc), doc_id,
                                        database='test_fake')
 
+    def test_add_documents(self):
+        doc_id_template = 'test_document_%03d'
+        str_doc_template = '<tree id=\'%d\'><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
+        with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
+                         logger=get_logger('test', silent=True)) as bx_client:
+            bx_client.create_database()
+            docs = list()
+            for x in xrange(0, 10):
+                docs.append(fromstring(str_doc_template % x))
+            ids, dupl = bx_client.add_documents(docs)
+            self.assertEqual(len(ids), 10)
+            self.assertEqual(len(dupl), 0)
+            ids, dupl = bx_client.add_documents(set(docs))
+            self.assertEqual(len(ids), 10)
+            self.assertEqual(len(dupl), 0)
+            self.assertEqual(len(bx_client.get_resources()), 20)
+            docs = {doc_id_template % x: fromstring(str_doc_template % x)
+                    for x in xrange(0, 10)}
+            ids, dupl = bx_client.add_documents(docs)
+            self.assertEqual(len(ids), 10)
+            self.assertEqual(len(dupl), 0)
+            self.assertEqual(sorted(ids), sorted(docs.keys()))
+            self.assertEqual(len(bx_client.get_resources()), 30)
+            for x in xrange(20, 30):
+                docs[doc_id_template % x] = fromstring(str_doc_template % x)
+            with self.assertRaises(pbx_errors.OverwriteError):
+                bx_client.add_documents(docs)
+            self.assertEqual(len(bx_client.get_resources()), 30)
+            ids, dupl = bx_client.add_documents(docs, skip_duplicated=True)
+            self.assertEqual(len(ids), 10)
+            self.assertEqual(len(dupl), 10)
+            self.assertEqual(len(bx_client.get_resources()), 40)
+
     def test_get_document(self):
         doc_id = 'test_document_001'
         str_doc = '<tree><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
@@ -172,6 +206,7 @@ def suite():
     tests_suite.addTest(TestBaseXClient('test_create_database'))
     tests_suite.addTest(TestBaseXClient('test_delete_database'))
     tests_suite.addTest(TestBaseXClient('test_add_document'))
+    tests_suite.addTest(TestBaseXClient('test_add_documents'))
     tests_suite.addTest(TestBaseXClient('test_get_document'))
     tests_suite.addTest(TestBaseXClient('test_delete_document'))
     tests_suite.addTest(TestBaseXClient('test_xpath'))
