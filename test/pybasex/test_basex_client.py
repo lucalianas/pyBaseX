@@ -30,6 +30,16 @@ class TestBaseXClient(unittest.TestCase):
         if self.basex_url is None:
             sys.exit('ERROR: no base URL for BaseX database provided')
 
+    def tearDown(self):
+        with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
+                         logger=get_logger('test', silent=True)) as bx_client:
+            try:
+                bx_client.delete_database()
+            except pbx_errors.UnknownDatabaseError:
+                # avoid errors if database was already deleted
+                pass
+
     def test_connect(self):
         c = BaseXClient(self.basex_url, self.db_name, self.basex_user,
                         self.basex_passwd)
@@ -62,7 +72,6 @@ class TestBaseXClient(unittest.TestCase):
             self.assertIn(self.db_name, dbs.keys())
             with self.assertRaises(pbx_errors.OverwriteError):
                 bx_client.create_database()
-            bx_client.delete_database()
 
     def test_delete_database(self):
         with BaseXClient(self.basex_url, default_database=self.db_name,
@@ -92,7 +101,6 @@ class TestBaseXClient(unittest.TestCase):
             with self.assertRaises(pbx_errors.UnknownDatabaseError):
                 bx_client.add_document(fromstring(str_doc), doc_id,
                                        database='test_fake')
-            bx_client.delete_database()
 
     def test_get_document(self):
         doc_id = 'test_document_001'
@@ -111,7 +119,6 @@ class TestBaseXClient(unittest.TestCase):
             self.assertIsNone(doc)
             with self.assertRaises(pbx_errors.UnknownDatabaseError):
                 bx_client.get_document(doc_id, database='test_fake')
-            bx_client.delete_database()
 
     def test_delete_document(self):
         doc_id = 'test_document_001'
@@ -128,7 +135,6 @@ class TestBaseXClient(unittest.TestCase):
             self.assertIsNone(doc)
             with self.assertRaises(pbx_errors.UnknownDatabaseError):
                 bx_client.delete_document(doc_id, database='test_fake')
-            bx_client.delete_database()
 
     def test_xpath(self):
         doc_id_pattern = 'test_document_%03d'
@@ -156,7 +162,6 @@ class TestBaseXClient(unittest.TestCase):
             with self.assertRaises(pbx_errors.UnknownDatabaseError):
                 bx_client.execute_query('/tree//leaf[@even="0"]/ancestor-or-self::leaf',
                                         database='test_fake')
-            bx_client.delete_database()
 
 
 def suite():
