@@ -24,3 +24,7 @@ class OverwriteError(Exception):
 
 class QueryError(Exception):
     pass
+
+
+class AuthenticationError(Exception):
+    pass
