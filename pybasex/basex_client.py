@@ -236,6 +236,13 @@ class BaseXClient(object):
         else:
             return result
 
+    @errors_handler
+    def get_documents(self, database=None):
+        db = self._resolve_database(database)
+        res = self.get_resources(db)
+        docs = {doc_id: self.get_document(doc_id, db) for doc_id in res.keys()}
+        return docs
+
     # --- objects deletion methods
     @errors_handler
     def delete_database(self, database=None):

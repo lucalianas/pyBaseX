@@ -154,6 +154,17 @@ class TestBaseXClient(unittest.TestCase):
             with self.assertRaises(pbx_errors.UnknownDatabaseError):
                 bx_client.get_document(doc_id, database='test_fake')
 
+    def test_get_documents(self):
+        str_doc = '<tree><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
+        with BaseXClient(self.basex_url, default_database=self.db_name,
+                         user=self.basex_user, password=self.basex_passwd,
+                         logger=get_logger('test', silent=True)) as bx_client:
+            bx_client.create_database()
+            docs = [fromstring(str_doc) for x in xrange(0, 10)]
+            _, _ = bx_client.add_documents(docs)
+            docs = bx_client.get_documents()
+            self.assertEqual(sorted(docs.keys()), sorted(bx_client.get_resources().keys()))
+
     def test_delete_document(self):
         doc_id = 'test_document_001'
         str_doc = '<tree><leaf id=\'1\'/><leaf id=\'2\'/><leaf id=\'3\'/></tree>'
@@ -208,6 +219,7 @@ def suite():
     tests_suite.addTest(TestBaseXClient('test_add_document'))
     tests_suite.addTest(TestBaseXClient('test_add_documents'))
     tests_suite.addTest(TestBaseXClient('test_get_document'))
+    tests_suite.addTest(TestBaseXClient('test_get_documents'))
     tests_suite.addTest(TestBaseXClient('test_delete_document'))
     tests_suite.addTest(TestBaseXClient('test_xpath'))
     return tests_suite
