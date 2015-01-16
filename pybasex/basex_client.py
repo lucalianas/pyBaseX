@@ -107,6 +107,9 @@ class BaseXClient(object):
         res_text = '<results>{0}</results>'.format(res_text)
         return pbx_xml_utils.str_to_xml(res_text)
 
+    def _get_document_id(self):
+        return uuid4().hex
+
     # --- objects creation methods
     @errors_handler
     def create_database(self, database=None):
@@ -123,7 +126,7 @@ class BaseXClient(object):
 
     @errors_handler
     def add_document(self, xml_doc, document_id=None, database=None):
-        document_id = document_id or uuid4().hex
+        document_id = document_id or self._get_document_id()
         db = self._resolve_database(database)
         if document_id in self.get_resources(db):
             raise pbx_errors.OverwriteError('A document with ID "%s" already exists in database "%s"' %
