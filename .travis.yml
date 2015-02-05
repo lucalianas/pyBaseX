@@ -19,6 +19,23 @@ env:
     - BASEX_PASSWD=admin
   matrix:
     - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.9/BaseX79.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.8.2/BaseX782.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.8.1/BaseX781.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.8/BaseX78.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.7.2/BaseX772.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.7.1/BaseX771.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.7/BaseX77.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.6/BaseX76.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.5/BaseX75.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.5/BaseX74.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.3/BaseX73.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.2.1/BaseX721.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.2/BaseX72.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.1.1/BaseX711.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.1/BaseX71.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.0.2/BaseX702.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.0.1/BaseX701.zip
+    - BASEX_DOWNLOAD_URL=http://files.basex.org/releases/7.0/BaseX70.zip
 
 before_install:
   # download and run BaseX server and REST interface
