@@ -59,7 +59,7 @@ class TestBaseXClient(unittest.TestCase):
         self.assertFalse(bx_client.connected)
 
     def test_connection_error(self):
-        with BaseXClient('http://localhost:0', logger=get_logger('test', silent=True)) as bx_client:
+        with BaseXClient('http://localhost:1', logger=get_logger('test', silent=True)) as bx_client:
             with self.assertRaises(pbx_errors.ConnectionError):
                 bx_client.get_databases()
 

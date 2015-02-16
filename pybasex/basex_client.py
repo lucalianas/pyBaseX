@@ -100,7 +100,7 @@ class BaseXClient(object):
         return response
 
     def _check_response_tag(self, response_xml):
-        if response_xml.tag != '{http://basex.org/rest}databases':
+        if not response_xml.tag.startswith('{http://basex.org/rest}database'):
             self._handle_wrong_url()
 
     def _wrap_results(self, res_text):
@@ -230,7 +230,7 @@ class BaseXClient(object):
             not_found_params=(db,)
         )
         result = pbx_xml_utils.str_to_xml(response.text)
-        if result.tag == '{http://basex.org/rest}databases' and int(result.get('resources')) == 0:
+        if result.tag.startswith('{http://basex.org/rest}database') and int(result.get('resources')) == 0:
             self.logger.info('There is not document with ID "%s" in database "%s"' % (document_id, db))
             return None
         else:
